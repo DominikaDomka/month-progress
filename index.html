@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Month Progress Widget</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: transparent;
+        }
+        .widget {
+            width: 300px;
+            text-align: center;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .progress {
+            height: 100%;
+            background-color: #4CAF50;
+            transition: width 0.5s ease-in-out;
+        }
+        .progress-text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .info {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="widget">
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+            <div class="progress-text" id="progress-text"></div>
+        </div>
+        <div class="info" id="info"></div>
+    </div>
+
+    <script>
+        function updateProgress() {
+            const now = new Date();
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+            
+            const totalMinutes = (endOfMonth - startOfMonth) / (1000 * 60);
+            const elapsedMinutes = (now - startOfMonth) / (1000 * 60);
+            
+            const progress = (elapsedMinutes / totalMinutes) * 100;
+            
+            const totalDays = endOfMonth.getDate();
+            const remainingDays = totalDays - now.getDate();
+            
+            document.getElementById('progress').style.width = `${progress}%`;
+            document.getElementById('progress-text').textContent = `${progress.toFixed(2)}%`;
+            document.getElementById('info').innerHTML = `This month has ${totalDays} days.<br>${remainingDays} days remaining in this month.`;
+        }
+
+        function scheduleNextUpdate() {
+            const now = new Date();
+            const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+            const timeUntilNextMonth = nextMonth - now;
+
+            setTimeout(() => {
+                updateProgress();
+                setInterval(updateProgress, 60000);
+                scheduleNextUpdate();
+            }, timeUntilNextMonth);
+        }
+
+        updateProgress();
+        setInterval(updateProgress, 60000);
+        scheduleNextUpdate();
+    </script>
+</body>
+</html>
